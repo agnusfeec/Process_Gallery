@@ -16,8 +16,8 @@ from matplotlib import pyplot as plt
 import itertools as it
 from multiprocessing.pool import ThreadPool
 
-kp_detector = None
-ds_extractor = None
+#from lib_files import *
+import lib_files as lbf
 
 # local modules
 #from common import Timer
@@ -70,7 +70,7 @@ class MaskableList(list):
         except TypeError: return MaskableList(compress(self, index))
 
 #%%
-def affine_detect(detector, img, mask=None, pool=None):
+def affine_detect(detector, img, mask=None, pool=None, consider=25):
     '''
     affine_detect(detector, img, mask=None, pool=None) -> keypoints, descrs
 
@@ -101,7 +101,7 @@ def affine_detect(detector, img, mask=None, pool=None):
             return keypoints, descrs
         else:
             if not(t==1.0 and phi==0.0):
-                mask = np.random.choice([False, True], len(descrs), p=[0.75, 0.25])
+                mask = np.random.choice([False, True], len(descrs), p=[1.0-consider, consider])
             else:
                 mask = np.random.choice([False, True], len(descrs), p=[0.0, 1.0])
 
@@ -122,106 +122,6 @@ def affine_detect(detector, img, mask=None, pool=None):
 
     print()
     return keypoints, np.array(descrs)
-
-#%%
-def ds_read(sift_folder, filename, sift_type):
-    import csv
-    import numpy as np
-    import os
-
-    ds_type = ''
-    ds_num = 0
-    ds_dim = 0
-
-    fname = os.path.join(sift_folder, filename[:-5] + '_' + sift_type + '_des.csv')
-
-    with open(fname, 'rb') as csvfile:
-
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        rownumber = 0
-
-        aux = []
-
-        for row in spamreader:
-
-            if rownumber == 0:
-
-                ds_type = row[0]
-                ds_num = row[1]
-                ds_dim = row[2]
-                rownumber = rownumber + 1
-
-            else:
-
-                aux.append(row)
-
-        ds = np.asarray(aux, dtype=np.float)
-
-        return ds
-
-#%%
-def kp_read(sift_folder, filename, sift_type):
-
-    import csv
-    import numpy as np
-    import os
-
-    kp_type = ''
-    kp_num = 0
-
-    fname = os.path.join(sift_folder, filename[:-5] + '_' + sift_type + '_kp.csv')
-
-    with open(fname, 'rb') as csvfile:
-
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        rownumber = 0
-
-        aux = []
-
-        for row in spamreader:
-
-            if rownumber == 0:
-
-                kp_type = row[0]
-                kp_num = row[1]
-                rownumber = rownumber + 1
-
-            else:
-
-                aux.append(row)
-
-        kp = np.asarray(aux, dtype=np.float32)
-
-        return kp, kp_type, kp_num
-
-#%%
-#https://docs.opencv.org/3.1.0/d5/daf/tutorial_py_histogram_equalization.html
-def kp_write(filename, tipo, kp):
-    import csv
-
-    file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
-
-    if not (kp is None) :
-        with open(file_path + filename, 'wb') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            spamwriter.writerow([tipo, len(kp)])
-            for point in kp:
-                spamwriter.writerow([point.pt[0], point.pt[1], point.size, point.angle, point.response, point.octave, point.class_id])
-
-
-#%%
-def des_write(filename, tipo, des):
-    import csv
-
-    file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
-
-    if not(des is None) :
-        with open(file_path + filename, 'wb') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            spamwriter.writerow([tipo, len(des), len(des[0])])
-            for desc in des:
-                spamwriter.writerow(desc)
-
 
 #%%
 def fast_do(relevant_path, files):
@@ -272,252 +172,6 @@ def fast_do(relevant_path, files):
         #cv.imwrite('fast_false.png',img3)
 
 
-#%%
-def sift_do(relevant_path, files):
-
-    import numpy as np
-    import cv2 as cv
-    from matplotlib import pyplot as plt
-
-    sift = cv.xfeatures2d.SIFT_create()
-
-    for img_file in files:
-
-        img_filename = relevant_path + "/" + img_file[:-1]
-
-        aux = cv.imread(img_filename,0)
-
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-        img = clahe.apply(aux)
-
-        # Find keypoints and descriptors directly
-        kp, des = sift.detectAndCompute(img,None)
-        print( len(kp) )
-
-        kp_write(img_file[7:-5]+'_sift_kp.csv','sift', kp)
-        des_write(img_file[7:-5]+'_sift_des.csv','sift', des)
-
-        #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
-
-#%%
-def surf_do(relevant_path, files):
-
-    import numpy as np
-    import cv2 as cv
-    from matplotlib import pyplot as plt
-
-    # Create SURF object. You can specify params here or later.
-    # Here I set Hessian Threshold to 400
-    surf = cv.xfeatures2d.SURF_create(300)
-
-
-    for img_file in files:
-
-        img_filename = relevant_path + "/" + img_file[:-1]
-
-        aux = cv.imread(img_filename,0)
-
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-        img = clahe.apply(aux)
-
-        # Find keypoints and descriptors directly
-        #kp, des = surf.detectAndCompute(img,None)
-        #print( len(kp) )
-
-        # Check present Hessian threshold
-        #print( surf.getHessianThreshold() )
-
-        # We set it to some 50000. Remember, it is just for representing in picture.
-        # In actual cases, it is better to have a value 300-500
-        surf.setHessianThreshold(300)
-
-        # Again compute keypoints and check its number.
-        kp, des = surf.detectAndCompute(img,None)
-        print( len(kp) )
-        print( surf.getHessianThreshold() )
-
-        kp_write(img_file[7:-5]+'_surf_kp.csv','surf', kp)
-        des_write(img_file[7:-5]+'_surf_des.csv','surf', des)
-
-        #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
-
-#%%
-def brief_do(relevant_path, files):
-
-    import numpy as np
-    import cv2 as cv
-    from matplotlib import pyplot as plt
-
-    # Initiate FAST detector
-    star = cv.xfeatures2d.StarDetector_create(20,15)
-
-    # Initiate BRIEF extractor
-    brief = cv.xfeatures2d.BriefDescriptorExtractor_create()
-
-    for img_file in files:
-
-        img_filename = relevant_path + "/" + img_file[:-1]
-
-        aux = cv.imread(img_filename,0)
-
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-        img1 = clahe.apply(aux)
-
-        #kernel = np.ones((8,8),np.float32)/64
-        #img = cv.filter2D(aux,-1,kernel)
-
-        #img = cv.GaussianBlur(img1,(7,7),0)
-        #img = aux
-        # find the keypoints with STAR
-        kp = star.detect(img1,None)
-        # compute the descriptors with BRIEF
-        kp, des = brief.compute(img1, kp)
-
-        #if len(kp)==0:
-        #    print img_file[:-1]
-
-        print( len(kp), img_file[:-1] )
-
-        kp_write(img_file[7:-5]+'_brief_kp.csv','brief', kp)
-        des_write(img_file[7:-5]+'_brief_des.csv','brief', des)
-
-        #img2 = cv.drawKeypoints(img1,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
-
-#%%
-def orb_do(relevant_path, files):
-
-    import numpy as np
-    import cv2 as cv
-    from matplotlib import pyplot as plt
-
-    # Initiate ORB detector
-    orb = cv.ORB_create(500,1.8,8,20)
-
-    for img_file in files:
-
-        img_filename = relevant_path + "/" + img_file[:-1]
-
-        aux = cv.imread(img_filename,0)
-
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-        img = clahe.apply(aux)
-
-        # find the keypoints with ORB
-        kp = orb.detect(img,None)
-        # compute the descriptors with ORB
-        kp, des = orb.compute(img, kp)
-
-        print( len(kp) )
-
-        kp_write(img_file[7:-5]+'_orb_kp.csv','orb', kp)
-        des_write(img_file[7:-5]+'_orb_des.csv','orb', des)
-
-        #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
-
-#%%
-def brisk_do(relevant_path, files):
-
-    import numpy as np
-    import cv2 as cv
-    from matplotlib import pyplot as plt
-
-    # Initiate ORB detector
-    brisk = cv.BRISK_create()
-
-    for img_file in files:
-
-        img_filename = relevant_path + "/" + img_file[:-1]
-
-        aux = cv.imread(img_filename,0)
-
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-        img = clahe.apply(aux)
-
-        # find the keypoints with ORB
-        kp = brisk.detect(img,None)
-        # compute the descriptors with ORB
-        kp, des = brisk.compute(img, kp)
-
-        print( len(kp) )
-
-        kp_write(img_file[7:-5]+'_brisk_kp.csv','brisk', kp)
-        des_write(img_file[7:-5]+'_brisk_des.csv','brisk', des)
-
-        #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
-
-
-#%%
-def freak_do(relevant_path, files):
-
-    import numpy as np
-    import cv2 as cv
-    from matplotlib import pyplot as plt
-
-    # Initiate FAST detector
-    star = cv.xfeatures2d.StarDetector_create(20,15)
-
-    # Initiate FREAK extractor
-    freak = cv.xfeatures2d.FREAK_create()
-
-    for img_file in files:
-
-        img_filename = relevant_path + "/" + img_file[:-1]
-
-        aux = cv.imread(img_filename,0)
-
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-        img = clahe.apply(aux)
-
-        # find the keypoints with STAR
-        kp = star.detect(img,None)
-
-        # find the keypoints with FREAK
-        kp, des = freak.compute(img, kp)
-
-        print( len(kp) )
-
-        kp_write(img_file[7:-5]+'_freak_kp.csv','freak', kp)
-        des_write(img_file[7:-5]+'_freak_des.csv','freak', des)
-
-        #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
-
-#%%
 class myDetector:
 
     def __init__(self, type='sift'):
@@ -526,27 +180,36 @@ class myDetector:
         #self.matcher_type = matcher_type
 
         if type == 'sift':
-            self.extractor = cv.xfeatures2d.SIFT_create()
+            self.detector = cv.xfeatures2d.SIFT_create()
+            self.extractor = None
         elif type == 'surf':
-            self.extractor = cv.xfeatures2d.SURF_create(800)
+            self.detector = cv.xfeatures2d.SURF_create(300)
+            self.extractor = None
         elif type == 'orb':
-            self.extractor = cv.ORB_create(400)
+            self.detector = cv.ORB_create(400)
+            self.extractor = None
         elif type == 'akaze':
-            self.extractor = cv.AKAZE_create()
+            self.detector = cv.AKAZE_create()
+            self.extractor = None
         elif type == 'brisk':
-            self.extractor = cv.BRISK_create()
+            self.detector = cv.BRISK_create()
+            self.extractor = None
         elif type == 'freak':
             self.detector = cv.xfeatures2d.StarDetector_create(20,15)
             self.extractor = cv.xfeatures2d.FREAK_create()
             self.norm = cv.NORM_HAMMING
+        elif type == 'brief':
+            self.detector = cv.xfeatures2d.StarDetector_create(20,15)
+            self.extractor = cv.xfeatures2d.BriefDescriptorExtractor_create()
         else:
+            self.extractor = cv.xfeatures2d.FREAK_create()
             self.detector = None
             self.extractor = None
             self.norm = None
 
     def detectAndCompute(self, timg, tmask):
-        if self.detector is None:
-            kp, ds = self.extractor.detectAndCompute(timg,tmask)
+        if self.extractor is None:
+            kp, ds = self.detector.detectAndCompute(timg,tmask)
         else:
             kp = self.detector.detect(timg, tmask)
             kp, ds = self.extractor.compute(timg, kp)
@@ -590,7 +253,40 @@ def init_feature(name):
     return detector, matcher
 
 #%%
-def asift_do(relevant_path, files, feature_name = "sift"):
+def descriptor_do(relevant_path, files, feature_name = "sift"):
+
+    import cv2 as cv
+    import numpy as np
+
+    detector = myDetector(feature_name)
+
+    for img_file in files:
+
+        img_filename = relevant_path + "/" + img_file[:-1]
+
+        aux = cv.imread(img_filename,0)
+
+        #Histograms Equalization in OpenCV
+        #img = cv.equalizeHist(aux)
+
+        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
+        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+        img1 = clahe.apply(aux)
+
+        # compute the descriptors with BRIEF
+        kp, des = detector.detectAndCompute(img1, None)
+
+        print( len(kp), img_file[:-1] )
+
+        lbf.kp_write(img_file[7:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
+        lbf.des_write(img_file[7:-5]+'_' + feature_name + '_des.csv', feature_name, des)
+
+        #img2 = cv.drawKeypoints(img1,kp,None,(255,0,0),4)
+        #plt.imshow(img2),plt.show()
+
+
+#%%
+def asift_do(relevant_path, files, feature_name = "sift", consider=25):
 
     import cv2 as cv
     import numpy as np
@@ -619,7 +315,7 @@ def asift_do(relevant_path, files, feature_name = "sift"):
         #img = aux
 
         pool=ThreadPool(processes = 4) #cv.getNumberOfCPUs())
-        kp, des = affine_detect(detector, img, pool=pool)
+        kp, des = affine_detect(detector, img, pool=pool, consider)
 
         print( len(kp) )
 
@@ -661,6 +357,7 @@ f.close()
 
 #print(lines)
 
+names = ['akaze', 'freak', 'brief', 'brisk', 'orb', 'sift', 'surf']
 #surf_do(relevant_path, lines)
 #brief_do(relevant_path, lines)
 #fast_do(relevant_path, lines)
@@ -668,7 +365,8 @@ f.close()
 #sift_do(relevant_path, lines)
 #brisk_do(relevant_path, lines)
 #freak_do(relevant_path, lines)
-asift_do(relevant_path, lines, 'freak')
+asift_do(relevant_path, lines, 'freak', 25)
+descriptor_do(relevant_path, lines, 'brief')
 
 #files = lines
 
