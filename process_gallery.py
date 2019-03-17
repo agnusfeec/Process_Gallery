@@ -70,7 +70,7 @@ class MaskableList(list):
         except TypeError: return MaskableList(compress(self, index))
 
 #%%
-def affine_detect(detector, img, mask=None, pool=None, consider=25):
+def affine_detect(detector, img, mask=None, consider=25, pool=None ):
     '''
     affine_detect(detector, img, mask=None, pool=None) -> keypoints, descrs
 
@@ -101,7 +101,7 @@ def affine_detect(detector, img, mask=None, pool=None, consider=25):
             return keypoints, descrs
         else:
             if not(t==1.0 and phi==0.0):
-                mask = np.random.choice([False, True], len(descrs), p=[1.0-consider, consider])
+                mask = np.random.choice([False, True], len(descrs), p=[1.0-consider/100, consider/100])
             else:
                 mask = np.random.choice([False, True], len(descrs), p=[0.0, 1.0])
 
@@ -263,7 +263,6 @@ def descriptor_do(relevant_path, file_path, files, feature_name = "sift"):
     for img_file in files:
 
         img_filename = relevant_path + "/" + img_file[:-1]
-
         aux = cv.imread(img_filename,0)
 
         #Histograms Equalization in OpenCV
@@ -278,8 +277,8 @@ def descriptor_do(relevant_path, file_path, files, feature_name = "sift"):
 
         print( len(kp), img_file[:-1] )
 
-        lbf.kp_write(file_path, img_file[7:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
-        lbf.des_write(file_path, img_file[7:-5]+'_' + feature_name + '_des.csv', feature_name, des)
+        lbf.kp_write(file_path, img_file[6:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
+        lbf.des_write(file_path, img_file[6:-5]+'_' + feature_name + '_des.csv', feature_name, des)
 
         #img2 = cv.drawKeypoints(img1,kp,None,(255,0,0),4)
         #plt.imshow(img2),plt.show()
@@ -315,12 +314,12 @@ def asift_do(relevant_path, file_path, files, feature_name = "sift", consider=25
         #img = aux
 
         pool=ThreadPool(processes = cv.getNumberOfCPUs())
-        kp, des = affine_detect(detector, img, pool=pool, consider)
+        kp, des = affine_detect(detector, img, consider, pool=pool)
 
         print( len(kp) )
 
-        kp_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + consider + '_kp.csv','a' + feature_name + '', kp)
-        des_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + consider + '_des.csv','a' + feature_name + '', des)
+        lbf.kp_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_kp.csv','a' + feature_name + '', kp)
+        lbf.des_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_des.csv','a' + feature_name + '', des)
 
         #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
         #plt.imshow(img2),plt.show()
@@ -329,20 +328,21 @@ def asift_do(relevant_path, file_path, files, feature_name = "sift", consider=25
 
 file_path = '/home/agnus/Documentos/Projeto/dataset/tatt-c/descriptors'
 
-relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification/test/"
-#gallery_file = "probes.txt"
-gallery_file = "gallery_small.txt"
+relevant_path = "/home/agnus/MEGA/Doutorado/dataset/tattc/tattoo_identification/test"
+gallery_file = "probes.txt"
+#gallery_file = "gallery_small.txt"
 
-#relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification/training"
+#relevant_path = "/home/agnus/MEGA/Doutorado/dataset/tattc/tattoo_identification/training"
 #gallery_file = "group.txt"
 
 f = open(relevant_path + "/"+ gallery_file, "r")
 lines = list(f)
 f.close()
 
-names = ['akaze', 'freak', 'brief', 'brisk', 'orb', 'sift', 'surf']
+#names = ['akaze', 'freak', 'brief', 'brisk', 'orb', 'sift', 'surf']
+names = ['sift']
 
-for name in names do
+for name in names:
     print(name)
-    #asift_do(relevant_path, file_path, lines, name, 25)
-    descriptor_do(relevant_path, lines, name)
+    asift_do(relevant_path, file_path, lines, name, 25)
+    #descriptor_do(relevant_path, file_path, lines, name)
