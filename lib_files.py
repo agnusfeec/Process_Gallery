@@ -71,10 +71,10 @@ def kp_read(sift_folder, filename, sift_type):
 
 #%%
 #https://docs.opencv.org/3.1.0/d5/daf/tutorial_py_histogram_equalization.html
-def kp_write(filename, tipo, kp):
+def kp_write(file_path, filename, tipo, kp):
     import csv
 
-    file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
+    #file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
 
     if not (kp is None) :
         with open(file_path + filename, 'wb') as csvfile:
@@ -85,10 +85,10 @@ def kp_write(filename, tipo, kp):
 
 
 #%%
-def des_write(filename, tipo, des):
+def des_write(file_path, filename, tipo, des):
     import csv
 
-    file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
+    #file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
 
     if not(des is None) :
         with open(file_path + filename, 'wb') as csvfile:

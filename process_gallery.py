@@ -253,7 +253,7 @@ def init_feature(name):
     return detector, matcher
 
 #%%
-def descriptor_do(relevant_path, files, feature_name = "sift"):
+def descriptor_do(relevant_path, file_path, files, feature_name = "sift"):
 
     import cv2 as cv
     import numpy as np
@@ -278,15 +278,15 @@ def descriptor_do(relevant_path, files, feature_name = "sift"):
 
         print( len(kp), img_file[:-1] )
 
-        lbf.kp_write(img_file[7:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
-        lbf.des_write(img_file[7:-5]+'_' + feature_name + '_des.csv', feature_name, des)
+        lbf.kp_write(file_path, img_file[7:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
+        lbf.des_write(file_path, img_file[7:-5]+'_' + feature_name + '_des.csv', feature_name, des)
 
         #img2 = cv.drawKeypoints(img1,kp,None,(255,0,0),4)
         #plt.imshow(img2),plt.show()
 
 
 #%%
-def asift_do(relevant_path, files, feature_name = "sift", consider=25):
+def asift_do(relevant_path, file_path, files, feature_name = "sift", consider=25):
 
     import cv2 as cv
     import numpy as np
@@ -314,27 +314,20 @@ def asift_do(relevant_path, files, feature_name = "sift", consider=25):
         img = clahe.apply(aux)
         #img = aux
 
-        pool=ThreadPool(processes = 4) #cv.getNumberOfCPUs())
+        pool=ThreadPool(processes = cv.getNumberOfCPUs())
         kp, des = affine_detect(detector, img, pool=pool, consider)
 
         print( len(kp) )
 
-        kp_write(img_file[6:-5]+'_a' + feature_name + '_kp.csv','a' + feature_name + '', kp)
-        des_write(img_file[6:-5]+'_a' + feature_name + '_des.csv','a' + feature_name + '', des)
+        kp_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + consider + '_kp.csv','a' + feature_name + '', kp)
+        des_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + consider + '_des.csv','a' + feature_name + '', des)
 
         #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
         #plt.imshow(img2),plt.show()
 
-#relevant_path = "/home/agnus/Documentos/dataset/tatt-c/tattoo_identification/test"
-#relevant_path = "/media/agnus/My Passport/Projeto/dataset/tatt-c/tattoo_identification/training"
-#gallery_file = "group.txt"
 
-#relevant_path = "/media/agnus/My Passport/Projeto/dataset/tatt-c/background/images/"
-#gallery_file = "bg.txt"
 
-#relevant_path = "/media/agnus/My Passport/Projeto/dataset/tatt-c/tattoo_identification/test"
-#gallery_file = "gallery_small.txt"
-#gallery_file = "probes.txt"
+file_path = '/home/agnus/Documentos/Projeto/dataset/tatt-c/descriptors'
 
 relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification/test/"
 #gallery_file = "probes.txt"
@@ -343,35 +336,13 @@ gallery_file = "gallery_small.txt"
 #relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification/training"
 #gallery_file = "group.txt"
 
-#relevant_path = "/media/sf_Projeto/dataset/tatt-c/background/images/"
-#gallery_file = "cropped.txt"
-
-# Open the file with read only permit
 f = open(relevant_path + "/"+ gallery_file, "r")
-# use readlines to read all lines in the file
-# The variable "lines" is a list containing all lines in the file
-# read all lines at once
 lines = list(f)
-# close the file after reading the lines.
 f.close()
 
-#print(lines)
-
 names = ['akaze', 'freak', 'brief', 'brisk', 'orb', 'sift', 'surf']
-#surf_do(relevant_path, lines)
-#brief_do(relevant_path, lines)
-#fast_do(relevant_path, lines)
-#orb_do(relevant_path, lines)
-#sift_do(relevant_path, lines)
-#brisk_do(relevant_path, lines)
-#freak_do(relevant_path, lines)
-asift_do(relevant_path, lines, 'freak', 25)
-descriptor_do(relevant_path, lines, 'brief')
 
-#files = lines
-
-#for img_file in files:
-#    print img_file
-#    #kp_read(img_file[7:-5]+'_brief_kp.csv','orb', kp)
-#    kp, _, _ = kp_read('', img_file[7:], 'surf')
-#    break
+for name in names do
+    print(name)
+    #asift_do(relevant_path, file_path, lines, name, 25)
+    descriptor_do(relevant_path, lines, name)
