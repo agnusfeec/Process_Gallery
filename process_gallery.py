@@ -70,7 +70,7 @@ class MaskableList(list):
         except TypeError: return MaskableList(compress(self, index))
 
 #%%
-def affine_detect(detector, img, mask=None, consider=25, pool=None ):
+def affine_detect(detector, consider, img, mask=None, pool=None ):
     '''
     affine_detect(detector, img, mask=None, pool=None) -> keypoints, descrs
 
@@ -86,8 +86,8 @@ def affine_detect(detector, img, mask=None, consider=25, pool=None ):
         for phi in np.arange(0, 180, 72.0 / t):
             params.append((t, phi))
 
-    def f(p):
-        t, phi = p
+    def f(param):
+        t, phi = param
         timg, tmask, Ai = affine_skew(t, phi, img)
 
         keypoints, descrs = detector.detectAndCompute(timg, tmask)
@@ -101,7 +101,7 @@ def affine_detect(detector, img, mask=None, consider=25, pool=None ):
             return keypoints, descrs
         else:
             if not(t==1.0 and phi==0.0):
-                mask = np.random.choice([False, True], len(descrs), p=[1.0-consider/100, consider/100])
+                mask = np.random.choice([False, True], len(descrs), p=[1.0-consider/100.0, consider/100.0])
             else:
                 mask = np.random.choice([False, True], len(descrs), p=[0.0, 1.0])
 
@@ -285,7 +285,7 @@ def descriptor_do(relevant_path, file_path, files, feature_name = "sift"):
 
 
 #%%
-def asift_do(relevant_path, file_path, files, feature_name = "sift", consider=25):
+def asift_do(relevant_path, file_path, files, feature_name, consider):
 
     import cv2 as cv
     import numpy as np
@@ -313,8 +313,8 @@ def asift_do(relevant_path, file_path, files, feature_name = "sift", consider=25
         img = clahe.apply(aux)
         #img = aux
 
-        pool=ThreadPool(processes = cv.getNumberOfCPUs())
-        kp, des = affine_detect(detector, img, consider, pool=pool)
+        pool=ThreadPool(processes = 1) #cv.getNumberOfCPUs())
+        kp, des = affine_detect(detector, consider, img, pool=pool)
 
         print( len(kp) )
 
@@ -326,14 +326,14 @@ def asift_do(relevant_path, file_path, files, feature_name = "sift", consider=25
 
 
 
-file_path = '/home/agnus/Documentos/Projeto/dataset/tatt-c/descriptors'
+file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
 
-relevant_path = "/home/agnus/MEGA/Doutorado/dataset/tattc/tattoo_identification/test"
-gallery_file = "probes.txt"
+#relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification/test"
+#gallery_file = "probes.txt"
 #gallery_file = "gallery_small.txt"
 
-#relevant_path = "/home/agnus/MEGA/Doutorado/dataset/tattc/tattoo_identification/training"
-#gallery_file = "group.txt"
+relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification//training"
+gallery_file = "group.txt"
 
 f = open(relevant_path + "/"+ gallery_file, "r")
 lines = list(f)
@@ -344,5 +344,5 @@ names = ['sift']
 
 for name in names:
     print(name)
-    asift_do(relevant_path, file_path, lines, name, 25)
+    asift_do(relevant_path, file_path, lines, name, 45)
     #descriptor_do(relevant_path, file_path, lines, name)
