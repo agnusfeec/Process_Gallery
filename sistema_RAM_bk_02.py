@@ -13,19 +13,6 @@ import os
 
 import lib_sistema_02 as ls
 
-#from vl_gmm_wrapper import *
-
-#import cbir_LBPSIFT_BOV as cs
-#import cbir_SIFT_BOV as cs
-#import cbir_SIFT as cs
-#import cbir_FV as cs
-
-#DT='201603231105'
-
-#path = "/media/agnus/My Passport/Projeto/dat_artigo"
-
-#path = "/home/agnus/Documentos/Projeto/dat_artigo"
-
 #%%
 def rodada(filename, metodo, bag, size, n_subsets, bg):
 
@@ -92,27 +79,6 @@ def rodada(filename, metodo, bag, size, n_subsets, bg):
         ls.processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo)
         LOGGER.info('processa_' + metodo + ': ending(' + str(time.time()-t_start)+')')
     
-    #elif ("SURF" in metodo)  and not ("BOV" in metodo) and not ("FV" in metodo):
-    #
-    #    t_start = time.time()
-    #    LOGGER.info('processa_surf: starting')
-    #    ls.processa_surf(folds, imagens, sift_folder, sift_type, LOGGER)
-    #    LOGGER.info('processa_surf: ending(' + str(time.time()-t_start)+')')
-    #
-    #elif ("BRIEF" in metodo)  and not ("BOV" in metodo) and not ("FV" in metodo):
-    #
-    #    t_start = time.time()
-    #    LOGGER.info('processa_brief: starting')
-    #    ls.processa_surf(folds, imagens, sift_folder, sift_type, LOGGER)
-    #    LOGGER.info('processa_brief: ending(' + str(time.time()-t_start)+')')
-    #
-    #elif ("ORB" in metodo)  and not ("BOV" in metodo) and not ("FV" in metodo):
-    #
-    #    t_start = time.time()
-    #    LOGGER.info('processa_orb: starting')
-    #    ls.processa_surf(folds, imagens, sift_folder, sift_type, LOGGER)
-    #    LOGGER.info('processa_orb: ending(' + str(time.time()-t_start)+')')
-    
     elif "FV" in metodo:
     
         # Inicialmente esta considerando apenas um fold, deve ser verifcado o caso
@@ -142,16 +108,6 @@ def rodada(filename, metodo, bag, size, n_subsets, bg):
             LOGGER.info('fv_generate_gmm: ending(' + str(time.time()-t_start)+')')
     
     #%%
-    
-            # alteração para permitir que considere toda a base
-#            if len(subsets)>2 :
-#                train = train+folds[i][2]
-#                t_start = time.time()
-#                LOGGER.info('le_descritores_train expandido: starting')
-#                ds, id_ds = ls.le_descritores(sift_folder, sift_type, train, 1)
-#                LOGGER.info('le_descritores_train expandido: ending(' + str(time.time()-t_start)+')')
-
-
             # # change to allow background images to be included
             if len(subsets)>2 :
                 train = train+folds[i][2]
@@ -317,7 +273,7 @@ def rodada(filename, metodo, bag, size, n_subsets, bg):
                 id_ds.extend(id_ds1)
     
     #%%
-            import random
+            #import random
             from scipy.cluster.vq import vq
     
             t_start = time.time()
