@@ -77,7 +77,7 @@ def kp_write(file_path, filename, tipo, kp):
     #file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
 
     if not (kp is None) :
-        with open(file_path + '/' + filename, 'wb') as csvfile:
+        with open(file_path + '/' + filename, 'w') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             spamwriter.writerow([tipo, len(kp)])
             for point in kp:
@@ -91,7 +91,7 @@ def des_write(file_path, filename, tipo, des):
     #file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
 
     if not(des is None) :
-        with open(file_path + '/' + filename, 'wb') as csvfile:
+        with open(file_path + '/' + filename, 'w') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             spamwriter.writerow([tipo, len(des), len(des[0])])
             for desc in des:

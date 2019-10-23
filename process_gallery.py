@@ -10,7 +10,7 @@ from __future__ import print_function
 
 import numpy as np
 import cv2 as cv
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 # built-in modules
 import itertools as it
@@ -116,17 +116,17 @@ def affine_detect(detector, consider, img, mask=None, pool=None ):
         ires = pool.imap(f, params)
 
     for i, (k, d) in enumerate(ires):
-        print('affine sampling: %d / %d\r' % (i+1, len(params)), end='')
+        #print('affine sampling: %d / %d\r' % (i+1, len(params)), end='')
         keypoints.extend(k)
         descrs.extend(d)
 
-    print()
+    #print()
     return keypoints, np.array(descrs)
 
 #%%
 def fast_do(relevant_path, files):
 
-    import numpy as np
+    #import numpy as np
     import cv2 as cv
     from matplotlib import pyplot as plt
 
@@ -156,7 +156,7 @@ def fast_do(relevant_path, files):
         #print( "neighborhood: {}".format(fast.getType()) )
         print( "Total Keypoints with nonmaxSuppression: {}".format(len(kp)) )
 
-        kp_write(img_file[7:-5]+'_fast_kp.csv','fast', kp)
+        lbf.kp_write(img_file[7:-5]+'_fast_kp.csv','fast', kp)
         #des_write(img_file[7:-5]+'_fast_des.csv','fast', des)
 
         #cv.imwrite('fast_true.png',img2)
@@ -190,6 +190,9 @@ class myDetector:
             self.extractor = None
         elif type == 'akaze':
             self.detector = cv.AKAZE_create()
+            self.extractor = None
+        elif type == '_kaze':
+            self.detector = cv.KAZE_create()
             self.extractor = None
         elif type == 'brisk':
             self.detector = cv.BRISK_create()
@@ -240,9 +243,9 @@ def init_feature(name):
         return None, None
     if 'flann' in chunks:
         if norm == cv.NORM_L2:
-            flann_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+            flann_params = dict(algorithm = cv.FLANN_INDEX_KDTREE, trees = 5)
         else:
-            flann_params= dict(algorithm = FLANN_INDEX_LSH,
+            flann_params= dict(algorithm = cv.FLANN_INDEX_LSH,
                                table_number = 6, # 12
                                key_size = 12,     # 20
                                multi_probe_level = 1) #2
@@ -255,41 +258,67 @@ def init_feature(name):
 #%%
 def descriptor_do(relevant_path, file_path, files, feature_name = "sift"):
 
+    import os
     import cv2 as cv
-    import numpy as np
-
+    from math import sqrt
+    #import numpy as np
+    #from matplotlib import pyplot as plt
+    
     detector = myDetector(feature_name)
 
     for img_file in files:
 
         img_filename = relevant_path + "/" + img_file[:-1]
-        aux = cv.imread(img_filename,0)
+        
+        
+        pp = img_file.find("/")
+        filename1 = img_file[pp:-5]+'_' + feature_name + '_kp.csv' 
+        filename2 = img_file[pp:-5]+'_' + feature_name + '_des.csv'
+        
+        if not (os.path.isfile(file_path + filename1) and os.path.isfile(file_path + filename2)) :
+     
+            aux = cv.imread(img_filename,0)
+    
+            #Histograms Equalization in OpenCV
+            #img = cv.equalizeHist(aux)
+    
+            #CLAHE (Contrast Limited Adaptive Histogram Equalization)
+            clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+            img1 = clahe.apply(aux)
+    
+            # compute the descriptors with BRIEF
+            kp, des = detector.detectAndCompute(img1, None)
+    
+            #print( len(kp), img_file[:-1] )
+            
+            if len(kp)<10:
+                
+                k = sqrt((240.0*480.0*1.0)/(img1.shape[0]*img1.shape[1]))
+                img2 = cv.resize(img1,None,fx=k, fy=k, interpolation = cv.INTER_CUBIC)
+    
+                # compute the descriptors with BRIEF
+                kp, des = detector.detectAndCompute(img2, None)
+        
+                if len(kp) == 0:
+                    print( len(kp), img_file[:-1] )
+    
+            pp = img_file.find("/")
+            #print( file_path, img_file[pp:-5], img_file[pp:-5]+'_' + feature_name + '_kp.csv', feature_name )
+            lbf.kp_write(file_path, img_file[pp:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
+            lbf.des_write(file_path, img_file[pp:-5]+'_' + feature_name + '_des.csv', feature_name, des)
+    
+            #img2 = cv.drawKeypoints(img1,kp,None,(255,0,0),4)
+            #plt.imshow(img2),plt.show()
 
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-        img1 = clahe.apply(aux)
-
-        # compute the descriptors with BRIEF
-        kp, des = detector.detectAndCompute(img1, None)
-
-        print( len(kp), img_file[:-1] )
-
-        lbf.kp_write(file_path, img_file[6:-5]+'_' + feature_name + '_kp.csv', feature_name, kp)
-        lbf.des_write(file_path, img_file[6:-5]+'_' + feature_name + '_des.csv', feature_name, des)
-
-        #img2 = cv.drawKeypoints(img1,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
-
+        print (img_file[:-1])
 
 #%%
 def asift_do(relevant_path, file_path, files, feature_name, consider):
 
+    import os
     import cv2 as cv
-    import numpy as np
-    from matplotlib import pyplot as plt
+    #import numpy as np
+    #from matplotlib import pyplot as plt
     #from find_obj import init_feature
 
     #detector = cv.xfeatures2d.SIFT_create()
@@ -303,46 +332,84 @@ def asift_do(relevant_path, file_path, files, feature_name, consider):
 
         img_filename = relevant_path + "/" + img_file[:-1]
 
-        aux = cv.imread(img_filename,0)
+        pp = img_file.find("/")
+        filename1 = img_file[pp:-5]+'_a' + feature_name + '_' + str(consider).zfill(3) + '_kp.csv' 
+        filename2 = img_file[pp:-5]+'_a' + feature_name + '_' + str(consider).zfill(3) + '_des.csv'
+        
+        if not (os.path.isfile(file_path + filename1) and os.path.isfile(file_path + filename2)) :
+        
+            aux = cv.imread(img_filename,0)
+            (w,h) = aux.shape
+            if(w*h)<10000:
+                res = cv.resize(aux,None,fx=1.5, fy=1.5, interpolation = cv.INTER_CUBIC)
+                aux = res
+                
+            #Histograms Equalization in OpenCV
+            #img = cv.equalizeHist(aux)
+    
+            #CLAHE (Contrast Limited Adaptive Histogram Equalization)
+            clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+            img = clahe.apply(aux)
+            #img = aux
+    
+            pool=ThreadPool(processes = 1) #cv.getNumberOfCPUs()-1) #check the case where CPU=1
+            kp, des = affine_detect(detector, consider, img, pool=pool)
+    
+            #print (img_file[:-1], len(kp), img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_kp.csv')
+            
+            #if(len(kp)>0):
+    
+            #    lbf.kp_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_kp.csv','a' + feature_name + '', kp)
+            #    lbf.des_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_des.csv','a' + feature_name + '', des)
+    
+            if len(kp) == 0:
+                print( len(kp), img_file[:-1] )
+    
+            pp = img_file.find("/")
+            #print( file_path, img_file[pp:-5], img_file[pp:-5]+'_a' + feature_name + '_kp.csv', 'a' + feature_name )
+            lbf.kp_write(file_path, filename1, 'a' + feature_name, kp)
+            lbf.des_write(file_path, filename2, 'a' + feature_name, des)
+    
+            #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
+            #plt.imshow(img2),plt.show()
 
-        #Histograms Equalization in OpenCV
-        #img = cv.equalizeHist(aux)
-
-        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
-        clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-        img = clahe.apply(aux)
-        #img = aux
-
-        pool=ThreadPool(processes = 1) #cv.getNumberOfCPUs())
-        kp, des = affine_detect(detector, consider, img, pool=pool)
-
-        print( len(kp) )
-
-        lbf.kp_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_kp.csv','a' + feature_name + '', kp)
-        lbf.des_write(file_path, img_file[6:-5]+'_a' + feature_name + '_' + str(consider) + '_des.csv','a' + feature_name + '', des)
-
-        #img2 = cv.drawKeypoints(img,kp,None,(255,0,0),4)
-        #plt.imshow(img2),plt.show()
+        
+        print (img_file[:-1])
+            
+#%%
+        
+file_path = '/Projeto/dataset/descriptors'
 
 
+r_path1 = "/Projeto/dataset/tatt-c/tattoo_identification/test"
+g_file11 = "probes.txt"
+g_file12 = "gallery_small.txt"
 
-file_path = '/media/sf_Projeto/Projetos/dataset/descriptors'
+r_path2 = "/Projeto/dataset/tatt-c/tattoo_identification/training"
+g_file21 = "group.txt"
 
-#relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification/test"
-#gallery_file = "probes.txt"
-#gallery_file = "gallery_small.txt"
+r_path3 = '/Projeto/dataset/tatt-c/background/images'
+g_file31 = 'cropped.txt'
+#sub_sets = [(r_path1, g_file1),(r_path1, g_file2),(r_path2, g_file3)]
+sub_sets = [(r_path1, g_file11),(r_path1, g_file12),(r_path2, g_file21),(r_path3, g_file31)] #,
+#sub_sets = [(r_path3, g_file31)]
 
-relevant_path = "/media/sf_Projeto/dataset/tatt-c/tattoo_identification//training"
-gallery_file = "group.txt"
 
-f = open(relevant_path + "/"+ gallery_file, "r")
-lines = list(f)
-f.close()
-
+#names = ['_kaze', 'akaze', 'freak', 'brief', 'brisk', 'orb', 'surf', 'sift']
 #names = ['akaze', 'freak', 'brief', 'brisk', 'orb', 'sift', 'surf']
-names = ['sift']
+#names = ['orb', 'sift', 'surf']
+names = ['surf']
 
-for name in names:
-    print(name)
-    asift_do(relevant_path, file_path, lines, name, 45)
-    #descriptor_do(relevant_path, file_path, lines, name)
+for (relevant_path, gallery_file) in sub_sets:
+    
+    print (relevant_path, gallery_file)
+    f = open(relevant_path + "/"+ gallery_file, "r")
+    lines = list(f)
+    f.close()
+
+    print (names)
+    
+    for name in names:
+        print(name)
+        asift_do(relevant_path, file_path, lines, name, 50)
+        descriptor_do(relevant_path, file_path, lines, name)
