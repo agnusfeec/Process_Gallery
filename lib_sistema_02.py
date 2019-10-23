@@ -54,15 +54,11 @@ def grava_config(arquivo, metodo, bag, size, n_subsets, bg):
     config.add_section('Geral')
     config.set('Geral', 'Image Database', 'Tatt-C')
 
-    #config.set('Geral', 'Database Image Folder', '/media/agnus/My Passport/Projeto/dataset/')
     config.set('Geral', 'Database Image Folder', '/Projeto/dataset/tatt-c/')
-    #config.set('Geral', 'Database Image Folder','/home/agnus/MEGA/Doutorado/dataset/tatt-c/')
 
     config.set('Geral', 'Indexa image database', 'True')
 
-    #config.set('Geral', 'Database filename', '/media/agnus/My Passport/Projeto/dat_artigo/tatt_c.db')
     config.set('Geral', 'Database filename', '/Projeto/Projetos/dat_artigo/tatt_c.db')
-    #config.set('Geral', 'Database filename', '/home/agnus/Documentos/Projeto/dat_artigo/tatt_c.db')
 
     config.set('Geral', 'Image filename extension','.jpg')
 
@@ -71,9 +67,6 @@ def grava_config(arquivo, metodo, bag, size, n_subsets, bg):
 
     config.add_section('Folds')
 
-    #config.set('Folds', 'Folds Folder', '/media/agnus/My Passport/Projeto/dataset/tatt-c_update_v1.4/5-fold/tattoo_identification/')
-    #config.set('Folds', 'Folds Folder', '/media/sf_Projeto/dataset/tatt-c/5-fold/tattoo_identification/')
-    #config.set('Folds', 'Folds Folder', '/home/agnus/MEGA/Doutorado/dataset/tatt-c/5-fold/tattoo_identification/')
     config.set('Folds', 'Folds Folder', '/Projeto/dataset/tatt-c_update_v1.4/5-fold/tattoo_identification/')
     config.set('Folds', 'Quantidade subsets', n_subsets)
     config.set('Folds', 'Subset_1', 'gallery{1,2,3,4,5}.txt')
@@ -84,20 +77,11 @@ def grava_config(arquivo, metodo, bag, size, n_subsets, bg):
         config.set('Folds', 'BG', bg)
     
     config.set('Folds', 'Ground_truth', 'ground_truth_classes.txt')
-    #config.set('Folds', 'Ground_truth', 'ground_truth.txt')
 
     config.add_section('SIFT')
-    #config.set('SIFT','SIFT Folder',  '/media/agnus/My Passport/Projeto/descriptors/')
     config.set('SIFT','SIFT Folder',  '/Projeto/dataset/descriptors/')
-    #config.set('SIFT','SIFT Folder','/home/agnus/Documentos/Projeto/dataset/tatt-c/descriptors')
-    #config.set('SIFT','SIFT Folder', '/media/sf_Projeto/dataset/tatt-c_artigo_v1/ASIFT')
-
+ 
     config.set('SIFT','SIFT Type',  metodo)
-    #config.set('SIFT','SIFT Type',  'mhlscd')
-    #config.set('SIFT','SIFT Type',  'asift')
-
-    #config.add_section('BOV') 
-    #config.set('BOV','Codebook Size',  size)
 
     config.add_section('BAG') # FV
     config.set('BAG','BAG Type', bag)
@@ -149,10 +133,8 @@ def le_config(filename):
     import configparser as ConfigParser
 
     config = ConfigParser.RawConfigParser()
-    #config.read('/media/agnus/My Passport/Projeto/dat_artigo/example_mem.cfg')
     config.read(filename)
-    #config.read('/home/agnus/Documentos/Projeto/dat_artigo/example_mem.cfg')
-
+ 
 
     # getfloat() raises an exception if the value is not a float
     # getint() and getboolean() also do this for their respective types
@@ -329,9 +311,6 @@ def sift_match(ds1, kp1, ds2, kp2):
                 matchesMask[i]=[1,0]
                 qm = qm + 1
 
-    #print ds1
-    #print ds2
-    #print qm
 
     (nr1,c) = ds1.shape
     (nr2,c) = ds2.shape
@@ -440,27 +419,13 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
 
             for file_test in test:
 
-                #fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_ds')
-                ##ds1 = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.uint8) #,skiprows=1)
-                #aux = np.asarray((np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float)) #* 255
-                #ds1 = aux.astype(np.float32)
-
                 ds1, _, _, _ = ds_read(sift_folder, file_test, sift_type)
 
                 if sift_type == 'mhlscd':
                     fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
                 else:
                     fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
-
-#                kps = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float) #,skiprows=1)
-#                kp1=[]
-#                kp2=[]
-#                for kp in kps:
-#                    kpoint = cv2.KeyPoint(float(kp[0]), float(kp[1]),
-#                                      float(kp[2]), float(kp[3]),
-#                                      float(kp[4]), int(kp[5]), int(kp[6]))
-#                    kp1.append(kpoint)
-
+                    
                 #print ("==> ", file_test)
                 kp1, _, _ = kp_read(sift_folder, file_test, sift_type)
 
@@ -491,17 +456,6 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
                             fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
                         else:
                             fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
-
-#                        kps = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float) #,skiprows=1)
-#                        #print fname
-#                        aux =[]
-#                        for kp in kps:
-#                            kpoint = cv2.KeyPoint(float(kp[0]), float(kp[1]),
-#                                      float(kp[2]), float(kp[3]),
-#                                      float(kp[4]), int(kp[5]), int(kp[6]))
-#                            aux.append(kpoint)
-#                        ks.append(aux)
-#                        kp2 = ks[j]
 
                         kp2, _, _ = kp_read(sift_folder, file_train, sift_type)
                         ks.append(kp2)
@@ -674,7 +628,6 @@ def processa_surf(folds, imagens, sift_folder, sift_type, LOGGER):
             ds=[]
             ks=[]
 
-        #arquivo = '/media/agnus/My Passport/Projeto/dat_artigo/clist_mem_'+str(i+1)+'.txt'
         arquivo = '/Projeto/Projetos/dat_artigo/clist_mem_'+str(i+1)+'.txt'
 
         with open(arquivo, 'w') as clist_file:
@@ -683,26 +636,12 @@ def processa_surf(folds, imagens, sift_folder, sift_type, LOGGER):
 
             for file_test in test:
 
-                #fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_ds')
-                #ds1 = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.uint8) #,skiprows=1)
-                #aux = np.asarray((np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float)) #* 255
-                #ds1 = aux.astype(np.float32)
-
                 ds1, _, _, _ = ds_read(sift_folder, file_test, sift_type)
 
                 if sift_type == 'mhlscd':
                     fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
                 else:
                     fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
-
-                #kps = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float) #,skiprows=1)
-                #kp1=[]
-                #kp2=[]
-                #for kp in kps:
-                #    kpoint = cv2.KeyPoint(float(kp[0]), float(kp[1]),
-                #                      float(kp[2]), float(kp[3]),
-                #                      float(kp[4]), int(kp[5]), int(kp[6]))
-                #    kp1.append(kpoint)
 
                 kp1, _, _ = kp_read(sift_folder, file_test, sift_type)
 
@@ -716,12 +655,6 @@ def processa_surf(folds, imagens, sift_folder, sift_type, LOGGER):
                     img2 = cv2.imread(os.path.join(diretorio, file_train),0)
                     #print os.path.join(diretorio, file_train)
                     if (mem == True and len(ds)<len(train)):
-                        #fname = os.path.join(sift_folder, file_train[:-3] + sift_type + '_ds')
-                        # mudança do tipo de uint8 para float em fução do mhlscd 03/10/2016
-                        #aux = np.asarray((np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float)) #* 255
-                        #ds.append ( aux.astype(np.float32)  ) #,skiprows=1)
-                        #print fname
-                        #ds2 = ds[j]
 
                         ds2, _, _, _ = ds_read(sift_folder, file_train, sift_type)
                         ds.append(ds2)
@@ -731,17 +664,6 @@ def processa_surf(folds, imagens, sift_folder, sift_type, LOGGER):
                             fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
                         else:
                             fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
-
-                        #kps = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float) #,skiprows=1)
-                        #print fname
-                        #aux =[]
-                        #for kp in kps:
-                        #    kpoint = cv2.KeyPoint(float(kp[0]), float(kp[1]),
-                        #              float(kp[2]), float(kp[3]),
-                        #              float(kp[4]), int(kp[5]), int(kp[6]))
-                        #    aux.append(kpoint)
-                        #ks.append(aux)
-                        #kp2 = ks[j]
 
                         kp2, _, _ = kp_read(sift_folder, file_train, sift_type)
                         ks.append(kp2)
@@ -929,18 +851,6 @@ def fv_generate_gmm(i, descriptors, N, dt):
     import numpy as np
 
     words = np.concatenate(descriptors)
-    #np.concatenate([folder_descriptors(folder) for folder in glob.glob(input_folder + '*')])
-    #print("Training GMM of size", N)
-    #means, covs, weights = fv_dictionary(words, N)
-    #Throw away gaussians with weights that are too small:
-    #th = 1.0 / N
-    #means = np.float32([m for k,m in zip(range(0, len(weights)), means) if weights[k] > th])
-    #covs = np.float32([m for k,m in zip(range(0, len(weights)), covs) if weights[k] > th])
-    #weights = np.float32([m for k,m in zip(range(0, len(weights)), weights) if weights[k] > th])
-
-    #print 'Means: ',means
-    #print 'Covs: ',covs
-    #print 'Weights: ',weights
 
 #%%
 
@@ -1063,19 +973,6 @@ def fv_fisher_vector(samples, means, covs, w):
     import vlfeat.fisher as vf
     from random import random
     import numpy as np
-
-    #    #print 'fisher_vector(samples, means, covs, w)'
-    #    s0, s1, s2 =  fv_likelihood_statistics(samples, means, covs, w)
-    #    T = samples.shape[0]
-    #    covs = np.float32([np.diagonal(covs[k]) for k in range(0, covs.shape[0])])
-    #    a = fv_fisher_vector_weights(s0, s1, s2, means, covs, w, T)
-    #    b = fv_fisher_vector_means(s0, s1, s2, means, covs, w, T)
-    #    c = fv_fisher_vector_sigma(s0, s1, s2, means, covs, w, T)
-    #    #print a
-    #    #print b
-    #    #print c
-    #    fv = np.concatenate([np.concatenate(a), np.concatenate(b), np.concatenate(c)])
-    #    fv = fv_normalize(fv)
 
     #numData = len(samples)
     #dimension  = len(sanples[0])
@@ -1295,7 +1192,6 @@ def gera_opf_dat(i, classes, hists, dt, test, tipo=1):
     print (classes)
     print ("classes = ",nc)
 
-    #path = "/media/agnus/My Passport/Projeto/dat_artigo/"
     path = "/Projeto/Projetos/dat_artigo/"
 
     if test == True:
@@ -1345,20 +1241,7 @@ def gera_opf_dat(i, classes, hists, dt, test, tipo=1):
             k = k + 1
 
     rs_file.close()
-
-#%%
-#def bov_histogramas_grava(hists, dt):
-#
-#    resultFile = open("./dat/sift_hists_tattc_"+dt+".txt", 'w')
-#    i = len(hists)
-#    for h in hists:
-#        line = (''.join(str(e) + ", " for e in h.tolist()))[:-2]
-#        resultFile.write(line)
-#        if i > 0:
-#            resultFile.write("\n")
-#        i = i - 1
-#
-#    resultFile.close()
+    
 #%%
 def bov_histogramas_grava(arquivo, hists, dt):
 

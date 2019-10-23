@@ -70,7 +70,7 @@ def rodada(filename, metodo, bag, size, n_subsets, bg):
     
     #metodo = "ASIFT_Ampliado"
     
-    metodos = ["SIFT", "ASIFT", "BRISK", "SURF", "BRIEF", "ORB", "FREAK", "AKAZE", "_AKAZE"]
+    #metodos = ["SIFT", "ASIFT", "BRISK", "SURF", "BRIEF", "ORB", "FREAK", "AKAZE", "_AKAZE"]
     
     if ("SIFT" in metodo or "BRISK" in metodo or "SURF" in metodo or "BRIEF" in metodo or "ORB" in metodo or "FREAK" in metodo or "AKAZE" in metodo or "_AKAZE")  and not ("BOV" in metodo) and not ("FV" in metodo):
     
