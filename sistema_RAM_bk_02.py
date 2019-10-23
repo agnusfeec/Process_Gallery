@@ -76,7 +76,7 @@ def rodada(filename, metodo, bag, size, n_subsets, bg):
     
         t_start = time.time()
         LOGGER.info('processa_' + metodo + ': starting')
-        ls.processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo)
+        ls.processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subsets)
         LOGGER.info('processa_' + metodo + ': ending(' + str(time.time()-t_start)+')')
     
     elif "FV" in metodo:

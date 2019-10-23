@@ -376,25 +376,37 @@ def gera_sift_base(folds, imagens, sift_folder, sift_type):
         #sift(bg, imagens, sift_folder, sift_type)
 
 #%%
-def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
+def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subsets):
 
     import numpy as np
     import os
     import cv2
     import time
 
+
     n_folds = len(folds)
+    
+    if len(subsets)>2:
+        n_bg = len(folds[0][2])
+    else:
+        n_bg = 0
+        
     #Alterei para que inclua nas imagens da galeria i no conj. train, de forma a que as
     # imagens correspondentes ao probe existam na galeria (train)
     for i in range(n_folds):
+        
         t_start = time.time()
         LOGGER.info('processa_' + metodo + ' Folder ' + str(i+1) + ': starting')
         test = folds[i][1]
-        #bg = folds[i][2]
-        train = folds[i][0] #+bg
+        
+        if len(subsets)>2:
+            train = folds[i][2] + folds[i][0] # background + train subset of the fold
+        else:
+            train = folds[i][0]
+            
         for j in range(n_folds):
             if j!=i :
-                train = train + folds[j][0]+folds[j][1]#+folds[j][2]
+                train = train + folds[j][0]+folds[j][1]
 
         n_test = len(test)
         n_train = len(train)
@@ -405,7 +417,7 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
         print ('Gerando o match entre o treinamento e o conjunto de teste')
 
         mem = True
-        if mem==True :
+        if mem==True and i == 0 :
             ds=[]
             ks=[]
 
@@ -429,7 +441,7 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
                 #print ("==> ", file_test)
                 kp1, _, _ = kp_read(sift_folder, file_test, sift_type)
 
-                diretorio = imagens[file_test]
+                #diretorio = imagens[file_test]
                 #img1 = cv2.imread(os.path.join(diretorio, file_test),0)
                 #print os.path.join(diretorio, file_test)
                 j = 0
@@ -438,7 +450,7 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
                     #diretorio = imagens[file_train]
                     #img2 = cv2.imread(os.path.join(diretorio, file_train),0)
                     #print os.path.join(diretorio, file_train)
-                    if (mem == True and len(ds)<len(train)):
+                    if (mem == True and ( i == 0 and l ==0) or (i > 0 and l == 0 and j >= n_bg)): #(mem == True and len(ds)<len(train)):
 #                        fname = os.path.join(sift_folder, file_train[:-3] + sift_type + '_ds')
 #                        # mudança do tipo de uint8 para float em fução do mhlscd 03/10/2016
 #                        aux = np.asarray((np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.float)) #* 255
@@ -451,16 +463,12 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
                         ds2, _, _, _ = ds_read(sift_folder, file_train, sift_type)
                         ds.append(ds2)
 
-                        #fname = os.path.join(sift_folder, file_train[:-3] + sift_type + '_kp')
-                        if sift_type == 'mhlscd':
-                            fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
-                        else:
-                            fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
+                        fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
 
                         kp2, _, _ = kp_read(sift_folder, file_train, sift_type)
                         ks.append(kp2)
 
-                    elif (mem == True and len(ds)==len(train)):
+                    elif (mem == True): # and len(ds)==len(train)):
                         ds2 = ds[j]
                         kp2 = ks[j]
                     elif mem == False:
@@ -485,6 +493,10 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo):
                     j = j + 1
                     print (i,(((l*n_train)+j)*100)/nn)
 
+                if n_bg>0:
+                    ds = ds[:bg]
+                    ks = ks[:bg]
+                    
                 indice = np.argsort(dist)[::-1]
                 k = 1
                 for id in indice:
