@@ -494,8 +494,8 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subset
                     print (i,(((l*n_train)+j)*100)/nn)
 
                 if n_bg>0:
-                    ds = ds[:bg]
-                    ks = ks[:bg]
+                    ds = ds[:n_bg]
+                    ks = ks[:n_bg]
                     
                 indice = np.argsort(dist)[::-1]
                 k = 1
