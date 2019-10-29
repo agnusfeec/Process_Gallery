@@ -450,6 +450,9 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subset
                     #diretorio = imagens[file_train]
                     #img2 = cv2.imread(os.path.join(diretorio, file_train),0)
                     #print os.path.join(diretorio, file_train)
+
+                    print(i, l, j, n_bg, len(ds))
+
                     if (mem == True and ( i == 0 and l ==0) or (i > 0 and l == 0 and j >= n_bg)): #(mem == True and len(ds)<len(train)):
 #                        fname = os.path.join(sift_folder, file_train[:-3] + sift_type + '_ds')
 #                        # mudança do tipo de uint8 para float em fução do mhlscd 03/10/2016
@@ -493,9 +496,9 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subset
                     j = j + 1
                     print (i,(((l*n_train)+j)*100)/nn)
 
-                if n_bg>0:
-                    ds = ds[:n_bg]
-                    ks = ks[:n_bg]
+#                if n_bg>0:
+#                    ds = ds[:n_bg]
+#                    ks = ks[:n_bg]
                     
                 indice = np.argsort(dist)[::-1]
                 k = 1
@@ -506,6 +509,14 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subset
                 l = l + 1
 
             clist_file.close()
+
+            # When the current folder is ready, in the next folder, delete ds and ks data for non-background images.
+            if n_bg>0:
+                ds = ds[:n_bg]
+                ks = ks[:n_bg]
+            else:
+                ds = []
+                ks = []
 
             LOGGER.info('processa_' + metodo + ' Folder : ending(' + str(time.time()-t_start)+')')
 

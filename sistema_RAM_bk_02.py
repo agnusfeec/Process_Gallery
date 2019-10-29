@@ -440,15 +440,15 @@ if __name__ == "__main__":
 
     #metodos = ['a_kaze_050', 'aakaze_050', 'afreak_050', 'abrief_050', 'abrisk_050', 'aorb_050', 'asurf_050', 'asift_050']
     metodos = ['sift']
-    n_subsets = 3 #number of subsets, 3 for include background, 2 otherwise
-    bg_perc = 100 #The percentage of background usage, for example 25, indicates that only 25% of all background images will be used.
+    n_subsets = 2 #number of subsets, 3 for include background, 2 otherwise
+    bg_perc = 0 #The percentage of background usage, for example 25, indicates that only 25% of all background images will be used.
                 #must be use only if n_subsets>2
                 
     for metodo in metodos:
         
         print(metodo)
         #bags=['BOV', 'FV', None]
-        bags=['BOV','FV']
+        bags=[None]
         
         for bag in bags:
         
