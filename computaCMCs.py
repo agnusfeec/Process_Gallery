@@ -131,6 +131,8 @@ metodos = ['dat_artigo_AAKAZE_50', 'dat_artigo_ABRIEF_50',
            'dat_artigo_SIFT', 'dat_artigo_SURF' ]
 #metodos = ['FV__KAZE_2', 'FV__KAZE_3', 'FV__KAZE_4', 'FV__KAZE_5', 'FV__KAZE_10', 'FV__KAZE_15']
 #metodos = ['dat_artigo_BOV__KAZE_00100']
+ 
+metodos = ['dat_artigo_SIFT_00000_BG000','dat_artigo_SIFT_00000_BG025','dat_artigo_SIFT_00000_BG050','dat_artigo_SIFT_00000_BG075','dat_artigo_SIFT_00000_BG100']
 for metodo in metodos:
     
     #metodo = metod[10:]

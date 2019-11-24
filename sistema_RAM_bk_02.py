@@ -440,60 +440,67 @@ if __name__ == "__main__":
 
     #metodos = ['a_kaze_050', 'aakaze_050', 'afreak_050', 'abrief_050', 'abrisk_050', 'aorb_050', 'asurf_050', 'asift_050']
     metodos = ['sift']
-    n_subsets = 2 #number of subsets, 3 for include background, 2 otherwise
+    n_subsets = 3 #number of subsets, 3 for include background, 2 otherwise
     bg_perc = 0 #The percentage of background usage, for example 25, indicates that only 25% of all background images will be used.
                 #must be use only if n_subsets>2
-                
-    for metodo in metodos:
-        
-        print(metodo)
-        #bags=['BOV', 'FV', None]
-        bags=[None]
-        
-        for bag in bags:
-        
-            if not bag is None:
-                if 'FV' in bag:
-                    #sizes=[1,2,3,4,5,10,15]
-                    sizes=[5]
-                elif 'BOV' in bag:
-                    #sizes=[10, 25, 50, 100, 200, 500, 1000]
-                    sizes=[50]
-            else:
-                sizes=[0]
-                
-            for size in sizes:
+    percents = [0,25,50,75,100]  # when n_subsets==3, percents==0 generate error in BOV    
+    for bg_perc in percents:
+
+        if bg_perc==0:
+            n_subsets = 2
+        else:
+            n_subsets = 3
             
-                if bag != None:
-                    filename = bag + '_'
-                else:
-                    filename = ""
-                    
-                fname = filename + metodo
-                if size!=0:
-                    fname = fname  + '_' + str(size).zfill(5)
-                
-                filename = filename + metodo + '_' + str(size).zfill(5)
-                
-                #if bg_perc>0:
-                filename = filename + '_BG' + str(bg_perc).zfill(3) 
-                fname = fname + '_BG' + str(bg_perc).zfill(3)
-                
-                print (fname)
-                
-                if not os.path.exists("/Projeto/Projetos/dat_artigo_" + fname.upper()):
+        for metodo in metodos:
             
-                    t_start_m = time.time()
-                    
-                    mf = open("/Projeto/Projetos/master.log" ,'a')
-                    mf.write((datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + ":" +  filename  + ": starting \n" )
-                    mf.close()
-                    
-                    rodada (filename, metodo, bag, size, n_subsets, bg_perc)
-                    
-                    mf = open("/Projeto/Projetos/master.log" ,'a')
-                    mf.write((datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + ":" + filename + ": ending (" + str(time.time()-t_start_m) + ")\n" )
-                    mf.close()
-                    
+            print(metodo)
+            #bags=['BOV', 'FV', None]
+            bags=[None]
+            
+            for bag in bags:
+            
+                if not bag is None:
+                    if 'FV' in bag:
+                        #sizes=[1,2,3,4,5,10,15]
+                        sizes=[5]
+                    elif 'BOV' in bag:
+                        #sizes=[10, 25, 50, 100, 200, 500, 1000]
+                        sizes=[200]
                 else:
-                    print("Folder exist!")
+                    sizes=[0]
+                    
+                for size in sizes:
+                
+                    if bag != None:
+                        filename = bag + '_'
+                    else:
+                        filename = ""
+                        
+                    fname = filename + metodo
+                    if size!=0:
+                        fname = fname  + '_' + str(size).zfill(5)
+                    
+                    filename = filename + metodo + '_' + str(size).zfill(5)
+                    
+                    #if bg_perc>0:
+                    filename = filename + '_BG' + str(bg_perc).zfill(3) 
+                    fname = fname + '_BG' + str(bg_perc).zfill(3)
+                    
+                    print (fname)
+                    
+                    if not os.path.exists("/Projeto/Projetos/dat_artigo_" + fname.upper()):
+                
+                        t_start_m = time.time()
+                        
+                        mf = open("/Projeto/Projetos/master.log" ,'a')
+                        mf.write((datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + ":" +  filename  + ": starting \n" )
+                        mf.close()
+                        
+                        rodada (filename, metodo, bag, size, n_subsets, bg_perc)
+                        
+                        mf = open("/Projeto/Projetos/master.log" ,'a')
+                        mf.write((datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + ":" + filename + ": ending (" + str(time.time()-t_start_m) + ")\n" )
+                        mf.close()
+                        
+                    else:
+                        print("Folder exist!")

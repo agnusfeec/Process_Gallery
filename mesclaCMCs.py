@@ -135,6 +135,21 @@ conj_metodos =[
 ['dat_artigo_SIFT', 'dat_artigo_ASIFT_50', 'dat_artigo_BOV_SURF_00050', 'dat_artigo_BOV_ASURF_50_00050', 'dat_artigo_FV_SURF_00003', 'dat_artigo_FV_ASURF_50_00010'], 
 ['dat_artigo_SIFT', 'dat_artigo_ASIFT_50', 'dat_artigo_BOV_SIFT_00050', 'dat_artigo_BOV_ASIFT_50_00200', 'dat_artigo_FV_SIFT_00001', 'dat_artigo_FV_ASIFT_50_00005']
 ]
+conj_metodos = [['dat_artigo_SIFT_00000_BG000','dat_artigo_SIFT_00000_BG025','dat_artigo_SIFT_00000_BG050','dat_artigo_SIFT_00000_BG075','dat_artigo_SIFT_00000_BG100']]
+
+conj_metodos = [['dat_artigo_AKAZE_00000_BG000','dat_artigo_AKAZE_00000_BG025','dat_artigo_AKAZE_00000_BG050','dat_artigo_AKAZE_00000_BG075','dat_artigo_AKAZE_00000_BG100']]
+
+conj_metodos =[['dat_artigo_BOV__KAZE_00100_BG000','dat_artigo_BOV__KAZE_00100_BG025','dat_artigo_BOV__KAZE_00100_BG050','dat_artigo_BOV__KAZE_00100_BG075','dat_artigo_BOV__KAZE_00100_BG100']]
+
+conj_metodos =[['dat_artigo_BOV__KAZE_00200_BG000','dat_artigo_BOV__KAZE_00200_BG025','dat_artigo_BOV__KAZE_00200_BG050','dat_artigo_BOV__KAZE_00200_BG075','dat_artigo_BOV__KAZE_00200_BG100']]
+
+conj_metodos = [['dat_artigo_FV_AKAZE_00001_BG000','dat_artigo_FV_AKAZE_00001_BG025','dat_artigo_FV_AKAZE_00001_BG050','dat_artigo_FV_AKAZE_00001_BG075','dat_artigo_FV_AKAZE_00001_BG100']]
+
+conj_metodos = [['dat_artigo_FV__KAZE_00005_BG000','dat_artigo_FV__KAZE_00005_BG025','dat_artigo_FV__KAZE_00005_BG050','dat_artigo_FV__KAZE_00005_BG075','dat_artigo_FV__KAZE_00005_BG100']]
+
+conj_metodos = [['dat_artigo__KAZE_00000_BG000','dat_artigo__KAZE_00000_BG025','dat_artigo__KAZE_00000_BG050','dat_artigo__KAZE_00000_BG075','dat_artigo__KAZE_00000_BG100']]
+
+
 #conj_metodos = [
 #['dat_artigo_BOV_A_KAZE_50_00010', 'dat_artigo_BOV_A_KAZE_50_00025', 'dat_artigo_BOV_A_KAZE_50_00050', 'dat_artigo_BOV_A_KAZE_50_00100', 'dat_artigo_BOV_A_KAZE_50_00200', 'dat_artigo_BOV_A_KAZE_50_00500', 'dat_artigo_BOV_A_KAZE_50_01000']
 #        ]

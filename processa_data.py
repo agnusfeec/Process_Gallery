@@ -141,6 +141,12 @@ conj_metodos = [
 ['dat_artigo_FV_A_KAZE_50_00004', 'dat_artigo_FV_AAKAZE_50_00005', 'dat_artigo_FV_ABRIEF_50_00004', 'dat_artigo_FV_ABRISK_50_00004', 'dat_artigo_FV_AFREAK_50_00002', 'dat_artigo_FV_AORB_50_00005', 'dat_artigo_FV_ASIFT_50_00005', 'dat_artigo_FV_ASURF_50_00015']
 ]
 
+conj_metodos = [
+    ['dat_artigo_BOV__KAZE_00100_BG000','dat_artigo_BOV__KAZE_00100_BG025','dat_artigo_BOV__KAZE_00100_BG050','dat_artigo_BOV__KAZE_00100_BG075','dat_artigo_BOV__KAZE_00100_BG100'],
+    ['dat_artigo_BOV__KAZE_00200_BG000','dat_artigo_BOV__KAZE_00200_BG025','dat_artigo_BOV__KAZE_00200_BG050','dat_artigo_BOV__KAZE_00200_BG075','dat_artigo_BOV__KAZE_00200_BG100'],
+    ['dat_artigo_FV_AKAZE_00001_BG000','dat_artigo_FV_AKAZE_00001_BG025','dat_artigo_FV_AKAZE_00001_BG050','dat_artigo_FV_AKAZE_00001_BG075','dat_artigo_FV_AKAZE_00001_BG100'],
+    ['dat_artigo_FV__KAZE_00005_BG000','dat_artigo_FV__KAZE_00005_BG025','dat_artigo_FV__KAZE_00005_BG050','dat_artigo_FV__KAZE_00005_BG075','dat_artigo_FV__KAZE_00005_BG100']
+]
     
 for metodos in conj_metodos:
     #build_cmc(arquivos, mylabels, mystyle, linestyles)
