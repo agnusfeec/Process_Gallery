@@ -149,7 +149,16 @@ conj_metodos = [['dat_artigo_FV__KAZE_00005_BG000','dat_artigo_FV__KAZE_00005_BG
 
 conj_metodos = [['dat_artigo__KAZE_00000_BG000','dat_artigo__KAZE_00000_BG025','dat_artigo__KAZE_00000_BG050','dat_artigo__KAZE_00000_BG075','dat_artigo__KAZE_00000_BG100']]
 
+conj_metodos = [['dat_artigo_BOV_SIFT_25', 'dat_artigo_BOV_SIFT_50', 'dat_artigo_BOV_SIFT_100', 'dat_artigo_BOV_SIFT_200', 'dat_artigo_BOV_SIFT_250','dat_artigo_BOV_SIFT_500', 'dat_artigo_BOV_SIFT_1000']]
+conj_metodos = [['dat_artigo_BOV_SURF_25', 'dat_artigo_BOV_SURF_50', 'dat_artigo_BOV_SURF_100', 'dat_artigo_BOV_SURF_200', 'dat_artigo_BOV_SURF_250','dat_artigo_BOV_SURF_500', 'dat_artigo_BOV_SURF_1000']]
+conj_metodos = [['dat_artigo_BOV_ORB_25', 'dat_artigo_BOV_ORB_50', 'dat_artigo_BOV_ORB_100', 'dat_artigo_BOV_ORB_200', 'dat_artigo_BOV_ORB_250','dat_artigo_BOV_ORB_500', 'dat_artigo_BOV_ORB_1000']]
+conj_metodos = [['dat_artigo_BOV__KAZE_25', 'dat_artigo_BOV__KAZE_50', 'dat_artigo_BOV__KAZE_100', 'dat_artigo_BOV__KAZE_200', 'dat_artigo_BOV__KAZE_250','dat_artigo_BOV__KAZE_500', 'dat_artigo_BOV__KAZE_1000']]
+conj_metodos = [[ 'dat_artigo_BOV_FREAK_50', 'dat_artigo_BOV_FREAK_100', 'dat_artigo_BOV_FREAK_200', 'dat_artigo_BOV_FREAK_250','dat_artigo_BOV_FREAK_500', 'dat_artigo_BOV_FREAK_1000']]
 
+conj_metodos = [['dat_artigo__KAZE_00000_BG000', 'dat_artigo_AKAZE_00000_BG000', 'dat_artigo_BRIEF_00000_BG000', 'dat_artigo_BRISK_00000_BG000', 'dat_artigo_FREAK_00000_BG000', 'dat_artigo_ORB_00000_BG000', 'dat_artigo_SIFT_00000_BG000', 'dat_artigo_SURF_00000_BG000'],
+['dat_artigo_A_KAZE_050__00000_BG000', 'dat_artigo_AAKAZE_050__00000_BG000', 'dat_artigo_ABRIEF_050__00000_BG000', 'dat_artigo_ABRISK_050__00000_BG000', 'dat_artigo_AFREAK_050__00000_BG000', 'dat_artigo_AORB_050__00000_BG000', 'dat_artigo_ASIFT_050__00000_BG000', 'dat_artigo_ASURF_050__00000_BG000']]
+
+#  conj_metodos = [['dat_artigo_BOV_SIFT_50','dat_artigo_BOV_SURF_100','dat_artigo_BOV_ORB_250', 'dat_artigo_BOV__KAZE_250', 'dat_artigo_BOV_FREAK_25',
 #conj_metodos = [
 #['dat_artigo_BOV_A_KAZE_50_00010', 'dat_artigo_BOV_A_KAZE_50_00025', 'dat_artigo_BOV_A_KAZE_50_00050', 'dat_artigo_BOV_A_KAZE_50_00100', 'dat_artigo_BOV_A_KAZE_50_00200', 'dat_artigo_BOV_A_KAZE_50_00500', 'dat_artigo_BOV_A_KAZE_50_01000']
 #        ]

@@ -101,6 +101,15 @@ def folds_construct(subsets, folds_folder, bg_perc):
     n_subsets = len(subsets)
  
     folds = []
+    images2exclude = []
+    
+    #le a lista de imagens a serem desconsideradas
+    with open("/Projeto/dataset/tatt-c/"+"files2exclude.txt", 'r') as imagefiles:
+        for nomef in imagefiles:
+            if nomef[-1] == '\n' : nomef = nomef[:-1]
+            images2exclude.append(nomef)
+    imagefiles.close()
+            
     for i in range(n_folds):
  
         random.seed(30) #to generate the same sequence of numbers every time
@@ -114,7 +123,9 @@ def folds_construct(subsets, folds_folder, bg_perc):
             with open(folds_folder+arquivo, 'r') as imagefiles:
                 for nomef in imagefiles:
                     if nomef[-1] == '\n' : nomef = nomef[:-1]
-                    aux.append(nomef)
+                    index = nomef.rfind('/')
+                    if not (nomef[index+1:] in images2exclude):
+                        aux.append(nomef)
             imagefiles.close()
             
             if j==2:
@@ -271,6 +282,7 @@ def sift(nomes_imagens, imagens, sift_folder, sift_type):
 def sift_match(ds1, kp1, ds2, kp2):
 
     import cv2
+    import numpy as np
 
     if 1==1:
 
@@ -280,7 +292,8 @@ def sift_match(ds1, kp1, ds2, kp2):
 
         #print ds1, ds2
 
-        matches = bf.knnMatch(ds1,ds2, k=2)
+        #matches = bf.knnMatch(ds1,ds2, k=2)
+        matches = bf.knnMatch(np.asarray(ds1,np.float32),np.asarray(ds2,np.float32),k=2)
 
         # Apply ratio test
         good = []
@@ -312,6 +325,10 @@ def sift_match(ds1, kp1, ds2, kp2):
                 qm = qm + 1
 
 
+    #print type(ds1), ds1
+    #print type(ds2), ds2
+    
+    
     (nr1,c) = ds1.shape
     (nr2,c) = ds2.shape
 
@@ -431,19 +448,42 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subset
 
             for file_test in test:
 
-                ds1, _, _, _ = ds_read(sift_folder, file_test, sift_type)
+                mask_folder = '/Projeto/dataset/masks/'
+                #print file_test
+                
+                mask = mask_read(mask_folder, file_test)
+        
+                kp1_aux, kp_type, kp_num = kp_read(sift_folder,file_test, sift_type)
+                aux, _, _, _ = ds_read(sift_folder, file_test, sift_type)
 
-                if sift_type == 'mhlscd':
-                    fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
-                else:
-                    fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
+                #print len(kp1), len(aux)
+                
+                ds1_aux = []
+                kp1 = []
+                
+                for kpt, des in zip(kp1_aux,aux):
+                    if mask[int(kpt.pt[1]), int(kpt.pt[0])] == 1:
+                        ds1_aux.append(des)
+                        kp1.append(kpt)
+                        
+                ds1 = np.asarray(ds1_aux, dtype=np.float32)
+                #ds1 = ds1_aux
+                
+                # as linhas abaixo foram comentadas em função do uso da mascara       
+        
+                #ds1, _, _, _ = ds_read(sift_folder, file_test, sift_type)
+
+                #if sift_type == 'mhlscd':
+                #    fname = os.path.join(sift_folder, file_test[:-3] + 'sift' + '_kp')
+                #else:
+                #    fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
                     
-                #print ("==> ", file_test)
-                kp1, _, _ = kp_read(sift_folder, file_test, sift_type)
+                ##print ("==> ", file_test)
+                #kp1, _, _ = kp_read(sift_folder, file_test, sift_type)
 
-                #diretorio = imagens[file_test]
-                #img1 = cv2.imread(os.path.join(diretorio, file_test),0)
-                #print os.path.join(diretorio, file_test)
+                ##diretorio = imagens[file_test]
+                ##img1 = cv2.imread(os.path.join(diretorio, file_test),0)
+                ##print os.path.join(diretorio, file_test)
                 j = 0
 
                 for file_train in train:
@@ -463,12 +503,28 @@ def processa_sift(folds, imagens, sift_folder, sift_type, LOGGER, metodo, subset
 
                         #print (file_train)
 
-                        ds2, _, _, _ = ds_read(sift_folder, file_train, sift_type)
+                        mask_folder = '/Projeto/dataset/masks/'
+                        mask = mask_read(mask_folder, file_train)
+        
+                        kp2_aux, kp_type, kp_num = kp_read(sift_folder,file_train, sift_type)
+                        aux, _, _, _ = ds_read(sift_folder, file_train, sift_type)
+
+                        ds2_aux = []
+                        kp2 = []
+                        
+                        for kpt, des in zip(kp2_aux,aux):
+                            if mask[int(kpt.pt[1]), int(kpt.pt[0])] == 1:
+                                ds2_aux.append(des)
+                                kp2.append(kpt)
+
+                        ds2 = np.asarray(ds2_aux, dtype=np.float32)
+                
+                        #ds2, _, _, _ = ds_read(sift_folder, file_train, sift_type)
                         ds.append(ds2)
 
                         fname = os.path.join(sift_folder, file_test[:-3] + sift_type + '_kp')
 
-                        kp2, _, _ = kp_read(sift_folder, file_train, sift_type)
+                        #kp2, _, _ = kp_read(sift_folder, file_train, sift_type)
                         ks.append(kp2)
 
                     elif (mem == True): # and len(ds)==len(train)):
@@ -612,8 +668,9 @@ def ds_read(sift_folder, filename, sift_type):
             #if rownumber>25000:
             #    break
 
-        ds = np.asarray(aux, dtype=np.float32)
-
+        #ds = np.asarray(aux, dtype=np.float32)
+        ds = aux
+   
         return ds, ds_type, ds_num, ds_dim
 
 
@@ -1013,7 +1070,7 @@ def fv_fisher_vector(samples, means, covs, w):
 
     return np.asarray(fv, dtype=np.float32)
 
-def le_descritores(sift_folder, sift_type, subset, tipo=1):
+def le_descritores_old(sift_folder, sift_type, subset, tipo=1):
 
     import os
     import numpy as np
@@ -1038,7 +1095,8 @@ def le_descritores(sift_folder, sift_type, subset, tipo=1):
         #fname = os.path.join(sift_folder, image[:-3] + sift_type + '_ds')
         #ds1 = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.uint8) #,skiprows=1)
 
-        ds1, _, _, _ = ds_read(sift_folder, image, sift_type)
+        aux, _, _, _ = ds_read(sift_folder, image, sift_type)
+        ds1 = np.asarray(aux, dtype=np.float32)    
 
         if tipo == 1:
             if ch == 0:
@@ -1064,6 +1122,109 @@ def le_descritores(sift_folder, sift_type, subset, tipo=1):
 
 #%%
 
+def mask_read(mask_folder, image_name):
+
+    import cv2 as cv
+    import os.path
+    from os import path
+
+    filename = image_name[:-4]+'_mask_'
+    cm = 1
+    
+    while True:
+        
+        ind = ('00'+str(cm))[-2:]
+        filename_full = mask_folder + filename + ind +'.jpg'
+        #print(filename_full)
+        
+        if path.exists(filename_full):
+            
+            aux = cv.imread(filename_full, cv.IMREAD_GRAYSCALE)
+            
+            # aplicada a mesma transformação utilizada qdo da geração dos descritores
+            (w,h) = aux.shape
+            if(w*h)<10000:
+                res = cv.resize(aux,None,fx=1.5, fy=1.5, interpolation = cv.INTER_CUBIC)
+                aux = res
+            
+            if cm==1:
+                _ , mask = cv.threshold(aux,127,1,cv.THRESH_BINARY)
+                
+            else:
+                #print(cm)
+                mask = cv.add(mask, cv.threshold(aux,127,1,cv.THRESH_BINARY)[1])
+            
+            cm = cm + 1
+        else:
+            #print('Terminou de montar a máscara!')
+            break
+            
+    return mask
+
+#%%
+# Le descritores conforme a mascara    
+def le_descritores(sift_folder, sift_type, subset,  tipo=1):
+
+    import os
+    import numpy as np
+
+    mask_folder = '/Projeto/dataset/masks/'
+    
+    #n_folds = len(folds)
+    #Alterei para que inclua nas imagens da galeria i no conj. train, de forma a que as
+    # imagens correspondentes ao probe existam na galeria (train)
+    #    for i in range(n_folds):
+    #        train = folds[i][0]
+    #        for j in range(n_folds):
+    #            if j!=i :
+    #                train = train + folds[j][0]+folds[j][1]+folds[j][2]
+    #
+    #        n_train = len(train)
+
+    ch = 0
+    ds = []
+    id_ds = []
+
+    for image in subset:
+
+        #fname = os.path.join(sift_folder, image[:-3] + sift_type + '_ds')
+        #ds1 = (np.loadtxt(open(fname,"r"),delimiter=",")).astype(np.uint8) #,skiprows=1)
+
+        mask = mask_read(mask_folder, image)
+        
+        kp1, kp_type, kp_num = kp_read(sift_folder,image, sift_type)
+        aux, _, _, _ = ds_read(sift_folder, image, sift_type)
+
+        ds1_aux = []
+        for kpt, des in zip(kp1,aux):
+            if mask[int(kpt.pt[1]), int(kpt.pt[0])] == 1:
+                ds1_aux.append(des)
+
+        ds1 = np.asarray(ds1_aux, dtype=np.float32)
+        
+        if tipo == 1:
+            if ch == 0:
+                ch = 1
+                ds = []
+                ds.append(ds1)
+                id_ds.append(ds1.shape[0])
+            else:
+                ds.append(ds1)
+                id_ds.append(ds1.shape[0])
+        else:
+            if ch == 0:
+                ch = 1
+                ds = np.empty_like(ds1)
+                ds[:] = ds1
+                id_ds.append(ds1.shape[0])
+            else:
+                print (ds.shape, ds1.shape)
+                ds = np.concatenate((ds, ds1), axis=0)
+                id_ds.append(ds1.shape[0])
+
+    return ds, id_ds
+
+#%%
 def bov_codebook_gera(l_sift, nc, tipo):
 
     if tipo == 1:

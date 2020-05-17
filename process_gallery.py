@@ -392,13 +392,14 @@ r_path3 = '/Projeto/dataset/tatt-c/background/images'
 g_file31 = 'cropped.txt'
 #sub_sets = [(r_path1, g_file1),(r_path1, g_file2),(r_path2, g_file3)]
 sub_sets = [(r_path1, g_file11),(r_path1, g_file12),(r_path2, g_file21),(r_path3, g_file31)] #,
+#sub_sets = [(r_path1, g_file11),(r_path1, g_file12),(r_path2, g_file21)] #,
 #sub_sets = [(r_path3, g_file31)]
 
 
-#names = ['_kaze', 'akaze', 'freak', 'brief', 'brisk', 'orb', 'surf', 'sift']
+names = ['_kaze', 'akaze', 'freak', 'brief', 'brisk', 'orb', 'surf', 'sift']
 #names = ['akaze', 'freak', 'brief', 'brisk', 'orb', 'sift', 'surf']
 #names = ['orb', 'sift', 'surf']
-names = ['sift']
+#names = ['sift']
 
 for (relevant_path, gallery_file) in sub_sets:
     
@@ -411,5 +412,5 @@ for (relevant_path, gallery_file) in sub_sets:
     
     for name in names:
         print(name)
-        #asift_do(relevant_path, file_path, lines, name, 50)
-        descriptor_do(relevant_path, file_path, lines, name)
+        asift_do(relevant_path, file_path, lines, name, 50)
+        #descriptor_do(relevant_path, file_path, lines, name)
